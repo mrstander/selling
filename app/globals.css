@@ -1,0 +1,120 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-sand-50 text-ink-900 font-body antialiased;
+  }
+
+  ::selection {
+    @apply bg-forest-200 text-forest-900;
+  }
+}
+
+@layer components {
+  .search-input {
+    @apply w-full px-5 py-4 bg-white border-2 border-sand-200 rounded-xl
+           font-body text-lg text-ink-900 placeholder:text-ink-300
+           outline-none transition-all duration-300
+           focus:border-forest-400 focus:shadow-[0_0_0_4px_rgba(139,191,170,0.15)];
+  }
+
+  .card {
+    @apply bg-white rounded-2xl border border-sand-200 
+           shadow-[0_1px_3px_rgba(0,0,0,0.04)] 
+           transition-all duration-300;
+  }
+
+  .card-hover {
+    @apply hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] 
+           hover:border-sand-300 hover:-translate-y-0.5;
+  }
+
+  .stat-label {
+    @apply text-xs font-medium uppercase tracking-widest text-ink-400;
+  }
+
+  .stat-value {
+    @apply text-2xl font-display text-ink-900;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full 
+           text-xs font-medium tracking-wide;
+  }
+
+  .badge-forest {
+    @apply badge bg-forest-100 text-forest-700;
+  }
+
+  .badge-sand {
+    @apply badge bg-sand-100 text-sand-700;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 
+           px-6 py-3 bg-forest-600 text-white font-medium rounded-xl
+           transition-all duration-200
+           hover:bg-forest-700 active:scale-[0.98]
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2
+           px-6 py-3 bg-white text-ink-700 font-medium rounded-xl
+           border-2 border-sand-200 transition-all duration-200
+           hover:border-sand-300 hover:bg-sand-50 active:scale-[0.98];
+  }
+}
+
+/* Smooth page transitions */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+.animate-fade-in-up-delay-1 {
+  animation: fadeInUp 0.5s ease-out 0.1s forwards;
+  opacity: 0;
+}
+
+.animate-fade-in-up-delay-2 {
+  animation: fadeInUp 0.5s ease-out 0.2s forwards;
+  opacity: 0;
+}
+
+.animate-fade-in-up-delay-3 {
+  animation: fadeInUp 0.5s ease-out 0.3s forwards;
+  opacity: 0;
+}
+
+/* Skeleton pulse */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  @apply rounded-lg;
+  background: linear-gradient(
+    90deg,
+    theme("colors.sand.100") 25%,
+    theme("colors.sand.200") 50%,
+    theme("colors.sand.100") 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
