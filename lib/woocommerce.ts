@@ -119,10 +119,8 @@ export async function createWCOrder(customerId: number, planName: string, total:
  */
 export async function getWCCustomerOrders(email: string) {
   try {
-    const customer = await getWCCustomer(email);
-    if (!customer) return [];
-    
-    return wcRequest<any[]>(`/orders?customer=${customer.id}`);
+    // Search orders by billing email directly to include guest orders
+    return wcRequest<any[]>(`/orders?search=${encodeURIComponent(email)}`);
   } catch (error) {
     console.error("Failed to fetch customer orders:", error);
     return [];

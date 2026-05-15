@@ -106,7 +106,7 @@ export default function HomePage() {
               <Building2 className="w-4 h-4 text-white" />
             </div>
             <span className="font-display text-xl text-ink-900 tracking-tight">
-              PropValue
+              Sellhome
             </span>
           </div>
           <div className="flex items-center gap-6 text-sm font-medium text-ink-600">

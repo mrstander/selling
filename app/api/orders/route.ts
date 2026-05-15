@@ -12,7 +12,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
 
+    console.log("Fetching WooCommerce orders for:", email);
     const orders = await getWCCustomerOrders(email);
+    console.log(`Found ${orders.length} orders for ${email}`);
     return NextResponse.json(orders);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

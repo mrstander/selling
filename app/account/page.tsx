@@ -49,10 +49,17 @@ export default function AccountPage() {
     setConsumedReports(consumed);
     
     fetchAccountData(email);
+
+    // Auto-refresh every 10 seconds
+    const interval = setInterval(() => {
+      fetchAccountData(email, true);
+    }, 10000);
+
+    return () => clearInterval(interval);
   }, [router]);
 
-  const fetchAccountData = async (email: string) => {
-    setIsLoading(true);
+  const fetchAccountData = async (email: string, silent = false) => {
+    if (!silent) setIsLoading(true);
     try {
       // 1. Fetch Orders
       const orderRes = await fetch(`/api/orders?email=${encodeURIComponent(email)}`, { cache: 'no-store' });

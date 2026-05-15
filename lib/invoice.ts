@@ -27,16 +27,16 @@ export const generateInvoicePDF = (data: InvoiceData) => {
   // Header
   doc.setFontSize(22);
   doc.setTextColor(20, 83, 45); // Forest Green
-  doc.text("PROPVALUE", 20, 20);
-  
+  doc.text("Sellhomes", 20, 20);
+
   doc.setFontSize(10);
   doc.setTextColor(100);
   doc.text("Verified Property Data Solutions", 20, 26);
-  
+
   doc.setFontSize(18);
   doc.setTextColor(40);
   doc.text("INVOICE", pageWidth - 20, 20, { align: "right" });
-  
+
   doc.setFontSize(10);
   doc.text(`Order ID: #${data.orderId}`, pageWidth - 20, 28, { align: "right" });
   doc.text(`Date: ${data.date}`, pageWidth - 20, 34, { align: "right" });
@@ -49,7 +49,7 @@ export const generateInvoicePDF = (data: InvoiceData) => {
   doc.setFontSize(12);
   doc.setTextColor(40);
   doc.text("BILL TO:", 20, 55);
-  
+
   doc.setFontSize(10);
   doc.setTextColor(80);
   doc.text(data.customerName, 20, 62);
@@ -61,7 +61,7 @@ export const generateInvoicePDF = (data: InvoiceData) => {
   doc.setFontSize(12);
   doc.setTextColor(40);
   doc.text("FROM:", pageWidth / 2 + 10, 55);
-  
+
   doc.setFontSize(10);
   doc.setTextColor(80);
   doc.text("PropValue (Pty) Ltd", pageWidth / 2 + 10, 62);
@@ -86,7 +86,7 @@ export const generateInvoicePDF = (data: InvoiceData) => {
 
   // Totals
   const finalY = (doc as any).lastAutoTable.finalY + 10;
-  
+
   doc.setFontSize(10);
   doc.setTextColor(100);
   doc.text("Payment Method:", 20, finalY + 5);
