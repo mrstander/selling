@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getWCCustomer, updateWCCustomer } from "@/lib/woocommerce";
 
+export const dynamic = 'force-dynamic';
+
 export async function PUT(request: NextRequest) {
   try {
     const { email, firstName, lastName } = await request.json();
