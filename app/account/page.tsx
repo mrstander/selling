@@ -51,7 +51,7 @@ export default function AccountPage() {
     setIsLoading(true);
     try {
       // 1. Fetch Orders
-      const orderRes = await fetch(`/api/orders?email=${encodeURIComponent(email)}`);
+      const orderRes = await fetch(`/api/orders?email=${encodeURIComponent(email)}`, { cache: 'no-store' });
       const orderData = await orderRes.json();
       if (Array.isArray(orderData)) {
         setOrders(orderData);

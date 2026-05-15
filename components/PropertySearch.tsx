@@ -40,7 +40,8 @@ export default function PropertySearch({ onSelect, onSearchResults }: PropertySe
       const endpoint = "/api/property-search";
 
       const res = await fetch(
-        `${endpoint}?q=${encodeURIComponent(searchQuery)}&limit=20`
+        `${endpoint}?q=${encodeURIComponent(searchQuery)}&limit=20`,
+        { cache: 'no-store' }
       );
       const data = await res.json();
 
