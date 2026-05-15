@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createWCOrder, getWCCustomerOrders, getWCCustomer } from "@/lib/woocommerce";
+import { createWCOrder, getWCCustomerOrders, getWCCustomer, registerWCCustomer } from "@/lib/woocommerce";
 
 export async function GET(request: NextRequest) {
   try {
