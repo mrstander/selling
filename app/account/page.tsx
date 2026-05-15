@@ -18,6 +18,7 @@ import {
   Loader2
 } from "lucide-react";
 import Link from "next/link";
+import { generateInvoicePDF } from "@/lib/invoice";
 import { formatZAR, formatDate } from "@/lib/utils";
 
 export default function AccountPage() {
@@ -158,6 +159,27 @@ export default function AccountPage() {
     } finally {
       setIsUpdating(false);
     }
+  };
+
+  const handleDownloadInvoice = (order: any) => {
+    generateInvoicePDF({
+      orderId: order.id.toString(),
+      date: formatDate(order.date_created),
+      customerName: `${order.billing.first_name} ${order.billing.last_name}`,
+      customerEmail: order.billing.email,
+      billingAddress: {
+        address: order.billing.address_1,
+        city: order.billing.city,
+        postcode: order.billing.postcode,
+      },
+      items: order.line_items.map((item: any) => ({
+        name: item.name,
+        quantity: item.quantity,
+        price: formatZAR(parseFloat(item.total)),
+      })),
+      total: formatZAR(parseFloat(order.total)),
+      paymentMethod: order.payment_method_title || "Direct Payment",
+    });
   };
 
   if (!isMounted) return null;
@@ -420,7 +442,11 @@ export default function AccountPage() {
                                 </span>
                               </td>
                               <td className="px-8 py-6 whitespace-nowrap text-right">
-                                <button className="p-2 text-ink-300 hover:text-forest-600 hover:bg-forest-50 rounded-lg transition-all opacity-0 group-hover:opacity-100">
+                                <button 
+                                  onClick={() => handleDownloadInvoice(order)}
+                                  className="p-2 text-ink-300 hover:text-forest-600 hover:bg-forest-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                  title="Download Invoice PDF"
+                                >
                                   <Download className="w-4 h-4" />
                                 </button>
                               </td>
