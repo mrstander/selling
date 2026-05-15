@@ -294,63 +294,100 @@ export default function AccountPage() {
                 </div>
 
                 <div className="bg-white rounded-3xl border border-sand-200 shadow-sm overflow-hidden">
-                  <div className="px-6 py-4 border-b border-sand-100 bg-sand-50/50">
-                    <h3 className="text-sm font-bold text-ink-900 uppercase tracking-widest flex items-center gap-2">
-                      <CreditCard className="w-4 h-4 text-blue-600" />
-                      Purchased Packages
-                    </h3>
+                  <div className="px-8 py-6 border-b border-sand-100 bg-sand-50/50 flex items-center justify-between">
+                    <div>
+                      <h3 className="text-sm font-bold text-ink-900 uppercase tracking-widest flex items-center gap-2">
+                        <CreditCard className="w-4 h-4 text-blue-600" />
+                        Full Order History
+                      </h3>
+                      <p className="text-xs text-ink-400 mt-1 uppercase tracking-tight">All transactions linked to {userEmail}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold text-ink-300 uppercase">Status:</span>
+                      <div className="flex items-center gap-1">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                        <span className="text-[10px] font-bold text-emerald-600 uppercase">Connected</span>
+                      </div>
+                    </div>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-left">
                       <thead>
-                        <tr className="bg-sand-50/30 border-b border-sand-200">
-                          <th className="px-6 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest">Order</th>
-                          <th className="px-6 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest">Package Name</th>
-                          <th className="px-6 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest">Date</th>
-                          <th className="px-6 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest">Price</th>
-                          <th className="px-6 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest">Status</th>
+                        <tr className="bg-white border-b border-sand-200">
+                          <th className="px-8 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest">Order ID</th>
+                          <th className="px-8 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest">Package / Report Type</th>
+                          <th className="px-8 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest">Transaction Date</th>
+                          <th className="px-8 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest">Amount Paid</th>
+                          <th className="px-8 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest">Status</th>
+                          <th className="px-8 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest text-right">Invoice</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-sand-100">
+                      <tbody className="divide-y divide-sand-100 bg-white">
                         {isLoading ? (
                           <tr>
-                            <td colSpan={5} className="px-6 py-12 text-center">
-                              <Loader2 className="w-6 h-6 text-forest-500 animate-spin mx-auto mb-2" />
-                              <p className="text-[10px] font-bold text-ink-300 uppercase">Syncing with WooCommerce...</p>
+                            <td colSpan={6} className="px-8 py-16 text-center">
+                              <Loader2 className="w-8 h-8 text-forest-500 animate-spin mx-auto mb-4" />
+                              <p className="text-xs font-bold text-ink-300 uppercase tracking-widest">Retrieving transactions...</p>
                             </td>
                           </tr>
                         ) : orders.length > 0 ? (
                           orders.map((order) => (
-                            <tr key={order.id} className="hover:bg-sand-50/50 transition-colors">
-                              <td className="px-6 py-5 whitespace-nowrap">
+                            <tr key={order.id} className="hover:bg-sand-50/50 transition-colors group">
+                              <td className="px-8 py-6 whitespace-nowrap">
                                 <p className="text-sm font-bold text-ink-900">#{order.id}</p>
                               </td>
-                              <td className="px-6 py-5">
-                                <p className="text-sm text-ink-900 font-medium">
-                                  {order.line_items?.[0]?.name || "Property Data Package"}
-                                </p>
-                                <p className="text-[10px] text-ink-400 uppercase tracking-widest mt-0.5">
-                                  SKU: {order.line_items?.[0]?.sku || "N/A"}
-                                </p>
+                              <td className="px-8 py-6">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-8 h-8 rounded-lg bg-sand-100 flex items-center justify-center text-ink-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
+                                    <FileText className="w-4 h-4" />
+                                  </div>
+                                  <div>
+                                    <p className="text-sm text-ink-900 font-bold">
+                                      {order.line_items?.[0]?.name || "Property Report Package"}
+                                    </p>
+                                    <p className="text-[10px] text-ink-400 uppercase tracking-widest mt-0.5">
+                                      {order.payment_method_title || "Direct Payment"}
+                                    </p>
+                                  </div>
+                                </div>
                               </td>
-                              <td className="px-6 py-5 whitespace-nowrap">
+                              <td className="px-8 py-6 whitespace-nowrap">
                                 <p className="text-sm text-ink-600">{formatDate(order.date_created)}</p>
                               </td>
-                              <td className="px-6 py-5 whitespace-nowrap text-sm font-bold text-ink-900">
-                                {formatZAR(parseFloat(order.total))}
+                              <td className="px-8 py-6 whitespace-nowrap">
+                                <p className="text-sm font-bold text-ink-900">{formatZAR(parseFloat(order.total))}</p>
                               </td>
-                              <td className="px-6 py-5 whitespace-nowrap">
-                                <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase ${order.status === 'completed' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
+                              <td className="px-8 py-6 whitespace-nowrap">
+                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${
+                                  order.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 
+                                  order.status === 'processing' ? 'bg-blue-100 text-blue-700' :
+                                  'bg-amber-100 text-amber-700'
+                                }`}>
+                                  <div className={`w-1 h-1 rounded-full ${
+                                    order.status === 'completed' ? 'bg-emerald-600' : 
+                                    order.status === 'processing' ? 'bg-blue-600' :
+                                    'bg-amber-600'
+                                  }`} />
                                   {order.status}
                                 </span>
+                              </td>
+                              <td className="px-8 py-6 whitespace-nowrap text-right">
+                                <button className="p-2 text-ink-300 hover:text-forest-600 hover:bg-forest-50 rounded-lg transition-all opacity-0 group-hover:opacity-100">
+                                  <Download className="w-4 h-4" />
+                                </button>
                               </td>
                             </tr>
                           ))
                         ) : (
                           <tr>
-                            <td colSpan={5} className="px-6 py-12 text-center text-ink-400 italic text-sm">
-                              No purchase history found. 
-                              <Link href="/pricing" className="ml-2 text-forest-600 not-italic font-bold hover:underline">View pricing</Link>
+                            <td colSpan={6} className="px-8 py-16 text-center">
+                              <div className="w-12 h-12 bg-sand-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-ink-200">
+                                <CreditCard className="w-6 h-6" />
+                              </div>
+                              <p className="text-sm text-ink-400 mb-4">No transactions found for this account.</p>
+                              <Link href="/pricing" className="bg-forest-600 text-white px-6 py-2.5 rounded-xl text-xs font-bold hover:bg-forest-700 transition-all inline-block shadow-lg shadow-forest-900/10">
+                                Buy a Package
+                              </Link>
                             </td>
                           </tr>
                         )}
