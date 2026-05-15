@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Building2, Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 
-export default function LoginPage() {
+function LoginContent() {
   const [isSignup, setIsSignup] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -174,5 +174,17 @@ export default function LoginPage() {
         Demo Credentials: demo@example.com / password123
       </p>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-sand-50 flex items-center justify-center">
+        <Loader2 className="w-10 h-10 text-forest-600 animate-spin" />
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   );
 }
