@@ -111,6 +111,51 @@ export default function AccountPage() {
   ];
 
   const [activeTab, setActiveTab] = useState<"reports" | "billing" | "settings">("reports");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [updateSuccess, setUpdateSuccess] = useState(false);
+
+  useEffect(() => {
+    if (userName) {
+      const parts = userName.split(" ");
+      setFirstName(parts[0] || "");
+      setLastName(parts.slice(1).join(" ") || "");
+    }
+  }, [userName]);
+
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsUpdating(true);
+    setUpdateSuccess(false);
+    
+    try {
+      const res = await fetch("/api/auth/update", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: userEmail,
+          firstName,
+          lastName
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Update failed");
+
+      // Update local state and storage
+      const newName = `${firstName} ${lastName}`.trim();
+      setUserName(newName);
+      localStorage.setItem("userName", newName);
+      setUpdateSuccess(true);
+      
+      setTimeout(() => setUpdateSuccess(false), 3000);
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   if (!isMounted) return null;
 
@@ -420,16 +465,90 @@ export default function AccountPage() {
             )}
 
             {activeTab === "settings" && (
-              <div className="bg-white rounded-3xl border border-sand-200 p-12 text-center">
-                <Settings className="w-12 h-12 text-ink-200 mx-auto mb-4" />
-                <h2 className="text-xl font-display text-ink-900 mb-2">Account Settings</h2>
-                <p className="text-sm text-ink-500 mb-8">This section is under construction.</p>
-                <button 
-                  onClick={() => setActiveTab("reports")}
-                  className="bg-forest-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-forest-700 transition-all"
-                >
-                  Back to Reports
-                </button>
+              <div className="space-y-8 animate-fade-in">
+                <div className="flex items-center justify-between flex-wrap gap-4">
+                  <div>
+                    <h1 className="text-3xl font-display text-ink-900 mb-1">Account Settings</h1>
+                    <p className="text-sm text-ink-500">Update your profile information and account preferences.</p>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-3xl border border-sand-200 shadow-sm overflow-hidden">
+                  <div className="px-8 py-6 border-b border-sand-100 bg-sand-50/50">
+                    <h3 className="text-sm font-bold text-ink-900 uppercase tracking-widest flex items-center gap-2">
+                      <User className="w-4 h-4 text-forest-600" />
+                      Personal Information
+                    </h3>
+                  </div>
+                  
+                  <form onSubmit={handleUpdateProfile} className="p-8 space-y-6 max-w-2xl">
+                    {updateSuccess && (
+                      <div className="p-4 rounded-xl bg-emerald-50 text-emerald-700 text-sm font-bold border border-emerald-100 animate-fade-in">
+                        Profile updated successfully! Changes synced to WooCommerce.
+                      </div>
+                    )}
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-ink-400 uppercase tracking-widest">First Name</label>
+                        <input 
+                          type="text" 
+                          value={firstName}
+                          onChange={(e) => setFirstName(e.target.value)}
+                          className="w-full px-4 py-3 rounded-xl border border-sand-200 focus:border-forest-500 focus:ring-4 focus:ring-forest-500/10 transition-all outline-none text-sm"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-ink-400 uppercase tracking-widest">Last Name</label>
+                        <input 
+                          type="text" 
+                          value={lastName}
+                          onChange={(e) => setLastName(e.target.value)}
+                          className="w-full px-4 py-3 rounded-xl border border-sand-200 focus:border-forest-500 focus:ring-4 focus:ring-forest-500/10 transition-all outline-none text-sm"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-ink-400 uppercase tracking-widest">Email Address</label>
+                      <input 
+                        type="email" 
+                        value={userEmail}
+                        disabled
+                        className="w-full px-4 py-3 rounded-xl border border-sand-100 bg-sand-50 text-ink-400 text-sm cursor-not-allowed"
+                      />
+                      <p className="text-[10px] text-ink-300 italic">Email address cannot be changed. Contact support for assistance.</p>
+                    </div>
+
+                    <div className="pt-4">
+                      <button 
+                        type="submit"
+                        disabled={isUpdating}
+                        className="px-8 py-3 bg-ink-900 text-white rounded-xl font-bold hover:bg-ink-800 transition-all flex items-center gap-2 shadow-lg shadow-sand-900/10 disabled:opacity-50"
+                      >
+                        {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4" />}
+                        Save Changes
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
+                <div className="bg-sand-100/50 rounded-3xl p-8 border border-dashed border-sand-300">
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-ink-400 border border-sand-200">
+                      <Settings className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-ink-900 uppercase tracking-widest mb-1">Advanced Settings</h4>
+                      <p className="text-xs text-ink-400 mb-4">Additional preferences and security settings will be available soon.</p>
+                      <button disabled className="text-[10px] font-bold text-ink-300 uppercase tracking-widest cursor-not-allowed">
+                        Coming Soon
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>

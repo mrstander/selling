@@ -75,6 +75,16 @@ export async function getWCCustomer(email: string) {
 }
 
 /**
+ * Update customer details in WooCommerce
+ */
+export async function updateWCCustomer(customerId: number, data: { first_name?: string; last_name?: string }) {
+  return wcRequest<any>(`/customers/${customerId}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+}
+
+/**
  * Create a new order in WooCommerce
  */
 export async function createWCOrder(customerId: number, planName: string, total: number, productId: number, billing: any) {
