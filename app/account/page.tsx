@@ -34,17 +34,20 @@ export default function AccountPage() {
     setIsMounted(true);
     const isLoggedIn = localStorage.getItem("isLoggedIn");
     const email = localStorage.getItem("userEmail");
+    const name = localStorage.getItem("userName");
     
-    if (!isLoggedIn) {
-      router.push("/login");
-    } else {
-      setUserEmail(email || "");
-      const consumed = JSON.parse(localStorage.getItem("consumedReports") || "[]");
-      setConsumedReports(consumed);
-      if (email) {
-        fetchAccountData(email);
-      }
+    if (!isLoggedIn || !email) {
+      router.push("/login?redirect=/account");
+      return;
     }
+
+    setUserEmail(email);
+    setUserName(name || "User");
+    
+    const consumed = JSON.parse(localStorage.getItem("consumedReports") || "[]");
+    setConsumedReports(consumed);
+    
+    fetchAccountData(email);
   }, [router]);
 
   const fetchAccountData = async (email: string) => {
