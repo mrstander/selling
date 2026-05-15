@@ -2,6 +2,7 @@
 
 import { MapPin, ArrowRight, Home, Users, Building, Download, FileText } from "lucide-react";
 import type { PropertySearchResult, SuburbSearchResult, CompleteSearchResult } from "@/types/lightstone";
+import Link from "next/link";
 
 interface PropertyResultsTableProps {
   results: (PropertySearchResult | SuburbSearchResult | CompleteSearchResult)[];

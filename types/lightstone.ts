@@ -358,6 +358,13 @@ export interface PropertyDetails {
   transferHistory?: TransferRecord[];
   ownerType?: string;
   addressDetail?: AddressDetail;
+  ownerCount?: number;
+  cadPoint?: {
+    coordinates: {
+      latitude: number;
+      longitude: number;
+    };
+  };
 }
 
 /** A single transfer/sale record */
