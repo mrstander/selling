@@ -110,6 +110,8 @@ export default function AccountPage() {
     }
   ];
 
+  const [activeTab, setActiveTab] = useState<"reports" | "billing" | "settings">("reports");
+
   if (!isMounted) return null;
 
   return (
@@ -148,7 +150,7 @@ export default function AccountPage() {
                 <div className="w-16 h-16 bg-forest-100 text-forest-600 rounded-2xl flex items-center justify-center mb-4">
                   <User className="w-8 h-8" />
                 </div>
-                <h2 className="font-display text-xl text-ink-900">{userName}</h2>
+                <h2 className="font-display text-xl text-ink-900">{userName || "User"}</h2>
                 <p className="text-sm text-ink-400 truncate">{userEmail}</p>
                 <div className="mt-4 flex items-center gap-2 text-[10px] font-bold text-forest-600 uppercase tracking-widest bg-forest-50 w-fit px-2 py-1 rounded-md">
                   <ShieldCheck className="w-3 h-3" />
@@ -157,209 +159,242 @@ export default function AccountPage() {
               </div>
             </div>
 
-            {billingAddress && (
-              <div className="bg-white rounded-3xl border border-sand-200 p-6 shadow-sm">
-                <h3 className="text-xs font-bold text-ink-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                  <MapPin className="w-3 h-3" />
-                  Billing Address
-                </h3>
-                <div className="space-y-1">
-                  <p className="text-sm font-bold text-ink-900">{billingAddress.fullName}</p>
-                  <p className="text-xs text-ink-500">{billingAddress.address}</p>
-                  <p className="text-xs text-ink-500">{billingAddress.city}, {billingAddress.postalCode}</p>
-                  <p className="text-xs text-ink-300 mt-2">{billingAddress.email}</p>
-                </div>
-              </div>
-            )}
-
             <nav className="space-y-1">
               {[
-                { name: "My Reports", icon: <FileText className="w-4 h-4" />, active: true },
-                { name: "Billing", icon: <CreditCard className="w-4 h-4" />, active: false },
-                { name: "Settings", icon: <Settings className="w-4 h-4" />, active: false }
+                { id: "reports", name: "My Reports", icon: <FileText className="w-4 h-4" /> },
+                { id: "billing", name: "Billing & Orders", icon: <CreditCard className="w-4 h-4" /> },
+                { id: "settings", name: "Settings", icon: <Settings className="w-4 h-4" /> }
               ].map((item) => (
                 <button 
-                  key={item.name}
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id as any)}
                   className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all
-                             ${item.active ? "bg-white text-forest-600 shadow-sm border border-sand-200" : "text-ink-400 hover:text-ink-600"}`}
+                             ${activeTab === item.id ? "bg-white text-forest-600 shadow-sm border border-sand-200" : "text-ink-400 hover:text-ink-600"}`}
                 >
                   <div className="flex items-center gap-3 text-sm font-medium">
                     {item.icon}
                     {item.name}
                   </div>
-                  {item.active && <ChevronRight className="w-4 h-4" />}
+                  {activeTab === item.id && <ChevronRight className="w-4 h-4" />}
                 </button>
               ))}
             </nav>
           </aside>
 
           {/* Content Area */}
-          <div className="lg:col-span-3 space-y-8">
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <div>
-                <h1 className="text-3xl font-display text-ink-900 mb-1">My Reports</h1>
-                <p className="text-sm text-ink-500">Access and manage all your purchased valuation reports.</p>
-              </div>
-              <Link 
-                href="/" 
-                className="flex items-center gap-2 px-6 py-3 bg-forest-600 text-white rounded-xl font-bold hover:bg-forest-700 transition-all shadow-lg shadow-forest-900/10"
-              >
-                <Search className="w-4 h-4" />
-                New Search
-              </Link>
-            </div>
-
-            {/* Unlocked Reports */}
-            <div className="bg-white rounded-3xl border border-sand-200 shadow-sm overflow-hidden mb-12">
-              <div className="px-6 py-4 border-b border-sand-100 bg-sand-50/50 flex items-center justify-between">
-                <h3 className="text-sm font-bold text-ink-900 uppercase tracking-widest flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-forest-600" />
-                  Unlocked Reports
-                </h3>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left">
-                  <thead>
-                    <tr className="bg-sand-50/30 border-b border-sand-200">
-                      <th className="px-6 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest">Type</th>
-                      <th className="px-6 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest">Property</th>
-                      <th className="px-6 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest">Date Unlocked</th>
-                      <th className="px-6 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest text-right">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-sand-100">
-                    {consumedReports.length > 0 ? (
-                      consumedReports.map((report, idx) => (
-                        <tr key={`${report.id}-${idx}`} className="group hover:bg-sand-50/50 transition-colors">
-                          <td className="px-6 py-5 whitespace-nowrap">
-                            <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase ${report.type === 'sellers' ? 'bg-forest-50 text-forest-700' : 'bg-blue-50 text-blue-700'}`}>
-                              {report.type}
-                            </span>
-                          </td>
-                          <td className="px-6 py-5">
-                            <p className="text-sm font-bold text-ink-900 line-clamp-1">{report.address}</p>
-                            <p className="text-[10px] text-ink-400 mt-0.5 font-mono">ID: {report.id}</p>
-                          </td>
-                          <td className="px-6 py-5 whitespace-nowrap">
-                            <p className="text-sm text-ink-600">{formatDate(report.date)}</p>
-                          </td>
-                          <td className="px-6 py-5 whitespace-nowrap text-right">
-                            <div className="flex items-center justify-end gap-2">
-                              <button 
-                                onClick={() => router.push(`/property/${report.id}?type=${report.type}`)}
-                                className="p-2 text-ink-400 hover:text-forest-600 hover:bg-forest-50 rounded-lg transition-all" 
-                              >
-                                <ExternalLink className="w-4 h-4" />
-                              </button>
-                              <button 
-                                onClick={() => alert("Downloading PDF...")}
-                                className="p-2 text-ink-400 hover:text-forest-600 hover:bg-forest-50 rounded-lg transition-all" 
-                              >
-                                <Download className="w-4 h-4" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={4} className="px-6 py-12 text-center text-ink-400 italic text-sm">
-                          No reports unlocked yet. 
-                          <Link href="/" className="ml-2 text-forest-600 not-italic font-bold hover:underline">Start searching</Link>
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* WooCommerce Order History */}
-            <div className="bg-white rounded-3xl border border-sand-200 shadow-sm overflow-hidden">
-              <div className="px-6 py-4 border-b border-sand-100 bg-sand-50/50">
-                <h3 className="text-sm font-bold text-ink-900 uppercase tracking-widest flex items-center gap-2">
-                  <CreditCard className="w-4 h-4 text-blue-600" />
-                  Order History & Credits
-                </h3>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left">
-                  <thead>
-                    <tr className="bg-sand-50/30 border-b border-sand-200">
-                      <th className="px-6 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest">Order</th>
-                      <th className="px-6 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest">Product</th>
-                      <th className="px-6 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest">Total</th>
-                      <th className="px-6 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-sand-100">
-                    {isLoading ? (
-                      <tr>
-                        <td colSpan={4} className="px-6 py-12 text-center">
-                          <Loader2 className="w-6 h-6 text-forest-500 animate-spin mx-auto mb-2" />
-                          <p className="text-[10px] font-bold text-ink-300 uppercase">Syncing orders...</p>
-                        </td>
-                      </tr>
-                    ) : orders.length > 0 ? (
-                      orders.map((order) => (
-                        <tr key={order.id} className="hover:bg-sand-50/50 transition-colors">
-                          <td className="px-6 py-5 whitespace-nowrap">
-                            <p className="text-sm font-bold text-ink-900">#{order.id}</p>
-                            <p className="text-[10px] text-ink-400">{formatDate(order.date_created)}</p>
-                          </td>
-                          <td className="px-6 py-5">
-                            <p className="text-sm text-ink-900 font-medium">
-                              {order.line_items?.[0]?.name || "Property Data Package"}
-                            </p>
-                          </td>
-                          <td className="px-6 py-5 whitespace-nowrap text-sm font-bold text-ink-900">
-                            {formatZAR(parseFloat(order.total))}
-                          </td>
-                          <td className="px-6 py-5 whitespace-nowrap">
-                            <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase ${order.status === 'completed' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
-                              {order.status}
-                            </span>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={4} className="px-6 py-12 text-center text-ink-400 italic text-sm">
-                          No orders found in WooCommerce.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Account Insights */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="card p-8 group overflow-hidden relative">
-                <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform">
-                  <CreditCard className="w-16 h-16" />
+          <div className="lg:col-span-3 space-y-8 animate-fade-in">
+            {activeTab === "reports" && (
+              <>
+                <div className="flex items-center justify-between flex-wrap gap-4">
+                  <div>
+                    <h1 className="text-3xl font-display text-ink-900 mb-1">My Reports</h1>
+                    <p className="text-sm text-ink-500">Access and manage all your purchased valuation reports.</p>
+                  </div>
+                  <Link 
+                    href="/" 
+                    className="flex items-center gap-2 px-6 py-3 bg-forest-600 text-white rounded-xl font-bold hover:bg-forest-700 transition-all shadow-lg shadow-forest-900/10"
+                  >
+                    <Search className="w-4 h-4" />
+                    New Search
+                  </Link>
                 </div>
-                <h3 className="font-display text-lg text-ink-900 mb-2">Billing History</h3>
-                <p className="text-sm text-ink-500 mb-6">View your invoices and manage your payment methods.</p>
-                <button className="text-xs font-bold text-forest-600 uppercase tracking-widest hover:underline flex items-center gap-2">
-                  Manage Billing
-                  <ChevronRight className="w-3 h-3" />
+
+                <div className="bg-white rounded-3xl border border-sand-200 shadow-sm overflow-hidden">
+                  <div className="px-6 py-4 border-b border-sand-100 bg-sand-50/50 flex items-center justify-between">
+                    <h3 className="text-sm font-bold text-ink-900 uppercase tracking-widest flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-forest-600" />
+                      Unlocked Reports
+                    </h3>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                      <thead>
+                        <tr className="bg-sand-50/30 border-b border-sand-200">
+                          <th className="px-6 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest">Type</th>
+                          <th className="px-6 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest">Property</th>
+                          <th className="px-6 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest">Date Unlocked</th>
+                          <th className="px-6 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest text-right">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-sand-100">
+                        {consumedReports.length > 0 ? (
+                          consumedReports.map((report, idx) => (
+                            <tr key={`${report.id}-${idx}`} className="group hover:bg-sand-50/50 transition-colors">
+                              <td className="px-6 py-5 whitespace-nowrap">
+                                <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase ${report.type === 'sellers' ? 'bg-forest-50 text-forest-700' : 'bg-blue-50 text-blue-700'}`}>
+                                  {report.type}
+                                </span>
+                              </td>
+                              <td className="px-6 py-5">
+                                <p className="text-sm font-bold text-ink-900 line-clamp-1">{report.address}</p>
+                                <p className="text-[10px] text-ink-400 mt-0.5 font-mono">ID: {report.id}</p>
+                              </td>
+                              <td className="px-6 py-5 whitespace-nowrap">
+                                <p className="text-sm text-ink-600">{formatDate(report.date)}</p>
+                              </td>
+                              <td className="px-6 py-5 whitespace-nowrap text-right">
+                                <div className="flex items-center justify-end gap-2">
+                                  <button 
+                                    onClick={() => router.push(`/property/${report.id}?type=${report.type}`)}
+                                    className="p-2 text-ink-400 hover:text-forest-600 hover:bg-forest-50 rounded-lg transition-all" 
+                                  >
+                                    <ExternalLink className="w-4 h-4" />
+                                  </button>
+                                  <button 
+                                    onClick={() => alert("Downloading PDF...")}
+                                    className="p-2 text-ink-400 hover:text-forest-600 hover:bg-forest-50 rounded-lg transition-all" 
+                                  >
+                                    <Download className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={4} className="px-6 py-12 text-center text-ink-400 italic text-sm">
+                              No reports unlocked yet. 
+                              <Link href="/" className="ml-2 text-forest-600 not-italic font-bold hover:underline">Start searching</Link>
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {activeTab === "billing" && (
+              <>
+                <div className="flex items-center justify-between flex-wrap gap-4">
+                  <div>
+                    <h1 className="text-3xl font-display text-ink-900 mb-1">Billing & Orders</h1>
+                    <p className="text-sm text-ink-500">Manage your purchases and view your transaction history.</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="bg-white rounded-3xl border border-sand-200 p-6 shadow-sm">
+                    <p className="text-xs font-bold text-ink-400 uppercase tracking-widest mb-1">Total Spent</p>
+                    <p className="text-2xl font-display text-ink-900">
+                      {formatZAR(orders.reduce((acc, o) => acc + parseFloat(o.total), 0))}
+                    </p>
+                  </div>
+                  <div className="bg-white rounded-3xl border border-sand-200 p-6 shadow-sm">
+                    <p className="text-xs font-bold text-ink-400 uppercase tracking-widest mb-1">Total Orders</p>
+                    <p className="text-2xl font-display text-ink-900">{orders.length}</p>
+                  </div>
+                  <div className="bg-white rounded-3xl border border-sand-200 p-6 shadow-sm">
+                    <p className="text-xs font-bold text-ink-400 uppercase tracking-widest mb-1">Active Credits</p>
+                    <p className="text-2xl font-display text-forest-600">
+                      {Math.max(0, orders.filter(o => o.status === "completed").length - consumedReports.length)} Available
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-3xl border border-sand-200 shadow-sm overflow-hidden">
+                  <div className="px-6 py-4 border-b border-sand-100 bg-sand-50/50">
+                    <h3 className="text-sm font-bold text-ink-900 uppercase tracking-widest flex items-center gap-2">
+                      <CreditCard className="w-4 h-4 text-blue-600" />
+                      Purchased Packages
+                    </h3>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                      <thead>
+                        <tr className="bg-sand-50/30 border-b border-sand-200">
+                          <th className="px-6 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest">Order</th>
+                          <th className="px-6 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest">Package Name</th>
+                          <th className="px-6 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest">Date</th>
+                          <th className="px-6 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest">Price</th>
+                          <th className="px-6 py-4 text-xs font-bold text-ink-400 uppercase tracking-widest">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-sand-100">
+                        {isLoading ? (
+                          <tr>
+                            <td colSpan={5} className="px-6 py-12 text-center">
+                              <Loader2 className="w-6 h-6 text-forest-500 animate-spin mx-auto mb-2" />
+                              <p className="text-[10px] font-bold text-ink-300 uppercase">Syncing with WooCommerce...</p>
+                            </td>
+                          </tr>
+                        ) : orders.length > 0 ? (
+                          orders.map((order) => (
+                            <tr key={order.id} className="hover:bg-sand-50/50 transition-colors">
+                              <td className="px-6 py-5 whitespace-nowrap">
+                                <p className="text-sm font-bold text-ink-900">#{order.id}</p>
+                              </td>
+                              <td className="px-6 py-5">
+                                <p className="text-sm text-ink-900 font-medium">
+                                  {order.line_items?.[0]?.name || "Property Data Package"}
+                                </p>
+                                <p className="text-[10px] text-ink-400 uppercase tracking-widest mt-0.5">
+                                  SKU: {order.line_items?.[0]?.sku || "N/A"}
+                                </p>
+                              </td>
+                              <td className="px-6 py-5 whitespace-nowrap">
+                                <p className="text-sm text-ink-600">{formatDate(order.date_created)}</p>
+                              </td>
+                              <td className="px-6 py-5 whitespace-nowrap text-sm font-bold text-ink-900">
+                                {formatZAR(parseFloat(order.total))}
+                              </td>
+                              <td className="px-6 py-5 whitespace-nowrap">
+                                <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase ${order.status === 'completed' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
+                                  {order.status}
+                                </span>
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={5} className="px-6 py-12 text-center text-ink-400 italic text-sm">
+                              No purchase history found. 
+                              <Link href="/pricing" className="ml-2 text-forest-600 not-italic font-bold hover:underline">View pricing</Link>
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {billingAddress && (
+                  <div className="bg-white rounded-3xl border border-sand-200 p-8 shadow-sm">
+                    <h3 className="text-lg font-display text-ink-900 mb-6 flex items-center gap-2">
+                      <MapPin className="w-5 h-5 text-forest-600" />
+                      Default Billing Address
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div>
+                        <p className="text-xs font-bold text-ink-400 uppercase tracking-widest mb-2">Customer Details</p>
+                        <p className="text-sm font-bold text-ink-900">{billingAddress.fullName}</p>
+                        <p className="text-sm text-ink-600">{billingAddress.email}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-ink-400 uppercase tracking-widest mb-2">Shipping To</p>
+                        <p className="text-sm text-ink-900">{billingAddress.address}</p>
+                        <p className="text-sm text-ink-900">{billingAddress.city}, {billingAddress.postalCode}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
+            {activeTab === "settings" && (
+              <div className="bg-white rounded-3xl border border-sand-200 p-12 text-center">
+                <Settings className="w-12 h-12 text-ink-200 mx-auto mb-4" />
+                <h2 className="text-xl font-display text-ink-900 mb-2">Account Settings</h2>
+                <p className="text-sm text-ink-500 mb-8">This section is under construction.</p>
+                <button 
+                  onClick={() => setActiveTab("reports")}
+                  className="bg-forest-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-forest-700 transition-all"
+                >
+                  Back to Reports
                 </button>
               </div>
-
-              <div className="card p-8 group overflow-hidden relative">
-                <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform">
-                  <ShieldCheck className="w-16 h-16" />
-                </div>
-                <h3 className="font-display text-lg text-ink-900 mb-2">Security & Privacy</h3>
-                <p className="text-sm text-ink-500 mb-6">Update your password and manage your account security.</p>
-                <button className="text-xs font-bold text-forest-600 uppercase tracking-widest hover:underline flex items-center gap-2">
-                  Security Settings
-                  <ChevronRight className="w-3 h-3" />
-                </button>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </main>
